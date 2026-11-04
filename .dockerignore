@@ -1,0 +1,11 @@
+.env
+.git
+.gitignore
+.vscode/
+venv/
+.venv/
+**/__pycache__
+**/*.pyc
+docker-compose.yml
+init.sql
+env.example

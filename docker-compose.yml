@@ -1,0 +1,46 @@
+
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: zeladoria-db
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "127.0.0.1:${DB_HOST_PORT:-5435}:5432"   
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro  
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  api:
+    build: .
+    container_name: zeladoria-api
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env                       
+    depends_on:
+      db:
+        condition: service_healthy 
+    restart: unless-stopped
+
+
+  cloudbeaver:
+    image: dbeaver/cloudbeaver:latest
+    container_name: zeladoria-dbeaver
+    ports:
+      - "127.0.0.1:8978:8978"      
+    volumes:
+      - cloudbeaver_data:/opt/cloudbeaver/workspace
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  cloudbeaver_data:
