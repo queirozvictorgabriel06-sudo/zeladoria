@@ -1,6 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routers import consultas, ocorrencias, categorias
+from pathlib import Path
+from fastapi.responses import FileResponse
+
 
 app = FastAPI(
     title="API Zeladoria Urbana",
@@ -17,6 +20,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/", include_in_schema=False)
+def tela():
+    return FileResponse(Path(__file__).parent / "static" / "index.html")
 
 app.include_router(consultas.router)
 app.include_router(ocorrencias.router)
