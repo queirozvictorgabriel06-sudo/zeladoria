@@ -1,98 +1,3 @@
-<!doctype html>
-<html lang="pt-BR">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Zeladoria Urbana</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-:root{--bg:#e9edf0;--card:#fff;--ink:#1c2229;--mut:#5b6672;--line:#d3dae0;--blue:#0b4ea2;--y:#ffc400;--g1:#1f8a5b;--g2:#c98f00;--g3:#d1342f;color-scheme:light dark}
-@media(prefers-color-scheme:dark){:root{--bg:#12161b;--card:#1b2128;--ink:#e7ebef;--mut:#9aa6b2;--line:#2c353f;--blue:#6aaeff;--g1:#3fc58a;--g2:#f2b82d;--g3:#ff6b64}}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:400 1rem/1.5 "Public Sans",system-ui,sans-serif}
-h1,h2,.big,.no,.plate{font-family:"Big Shoulders Display","Arial Narrow",sans-serif;font-weight:800;line-height:1}
-h1{font-size:2.3rem;margin:0}h2{font-size:1.5rem;margin:0 0 .4rem}
-a{color:var(--blue)}
-:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
-header{background:#1c2229;position:sticky;top:0;z-index:5}
-header :focus-visible{outline-color:var(--y)}
-.top{max-width:1100px;margin:auto;padding:.7rem 1rem;display:flex;gap:1rem;align-items:center;flex-wrap:wrap}
-.plate{font-size:1.5rem;background:#0b4ea2;color:#fff;text-decoration:none;padding:.5rem .9rem;border-radius:6px;outline:2px solid #fff;outline-offset:-4px}
-nav{display:flex;gap:.25rem;flex:1;flex-wrap:wrap}
-nav a{color:#c9d2db;text-decoration:none;padding:.45rem .8rem;border-radius:6px;font-weight:600;font-size:.95rem}
-nav a:hover{background:#2b333c;color:#fff}
-nav a[aria-current=page]{background:var(--y);color:#1c2229}
-.pill{font:600 .85rem "Public Sans",sans-serif;border:1px solid #3a444f;background:none;color:#c9d2db;border-radius:99px;padding:.35rem .8rem;cursor:pointer}
-.pill::before{content:"";display:inline-block;width:.6rem;height:.6rem;border-radius:50%;background:#9aa6b2;margin-right:.45rem}
-.pill.ok::before{background:#3fc58a}.pill.off::before{background:#ff6b64}
-#msg{background:var(--y);color:#1c2229;text-align:center;padding:.5rem 1rem;font-weight:600}
-main{max-width:1100px;margin:auto;padding:1.5rem 1rem 3rem}
-.mut{color:var(--mut)}.sr{position:absolute;left:-9999px}
-.hero{display:flex;align-items:flex-end;gap:1.2rem;margin:.5rem 0 1.2rem}
-.big{font-size:clamp(5rem,16vw,9rem);margin:0;line-height:.8}
-.road{display:flex;height:2.4rem;background:#2a3038;border-radius:6px;overflow:hidden;position:relative}
-.road::after{content:"";position:absolute;left:0;right:0;top:50%;border-top:3px dashed rgba(255,255,255,.75)}
-.road b{display:block;height:100%}
-.legend{display:flex;gap:1.6rem;flex-wrap:wrap;margin:.8rem 0 2rem}
-.g{display:inline-flex;align-items:center;gap:.45rem;font-weight:600}
-.g i{display:inline-block;width:.85rem;height:.85rem;background:var(--c)}
-.g1{--c:var(--g1)}.g2{--c:var(--g2)}.g3{--c:var(--g3)}
-.g1 i{border-radius:50%}.g2 i{transform:rotate(45deg) scale(.8)}
-.g3 i{clip-path:polygon(30% 0,70% 0,100% 30%,100% 70%,70% 100%,30% 100%,0 70%,0 30%)}
-.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;margin-bottom:1.5rem}
-.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:1.1rem 1.2rem}
-.rk{display:grid;grid-template-columns:1fr auto;gap:.2rem .8rem;margin:.7rem 0}
-.rk .bar{grid-column:1/-1;height:.45rem;background:var(--line);border-radius:9px}
-.rk .bar i{display:block;height:100%;background:var(--blue);border-radius:9px}
-.head{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap}
-.filters{display:flex;gap:.6rem;flex-wrap:wrap;margin:1rem 0}.filters input{flex:1 1 14rem}
-input,select{font:inherit;color:inherit;background:var(--card);border:1.5px solid var(--line);border-radius:6px;padding:.55rem .7rem;min-width:0}
-.tw{overflow-x:auto;margin-top:1rem}
-table{width:100%;border-collapse:collapse;font-size:.95rem}
-th{text-align:left;font-weight:600;color:var(--mut);padding:.6rem .7rem;border-bottom:2px solid var(--ink)}
-td{padding:.65rem .7rem;border-bottom:1px solid var(--line)}
-.no{display:inline-block;min-width:2.6rem;text-align:center;font-size:1.1rem;border:2px solid var(--ink);border-radius:4px;padding:.25rem .4rem}
-.btn{font:600 .95rem "Public Sans",sans-serif;border:2px solid var(--ink);background:var(--ink);color:var(--bg);border-radius:6px;padding:.55rem 1rem;cursor:pointer;text-decoration:none;display:inline-block}
-.btn.main{background:var(--y);color:#1c2229;border-color:#1c2229}
-.btn.sec{background:none;color:var(--ink)}
-.btn.del{background:none;color:var(--g3);border-color:var(--g3)}
-.btn.sm{padding:.3rem .7rem;font-size:.85rem}
-.form{display:grid;gap:.9rem}.form label{display:grid;gap:.25rem;font-weight:600;font-size:.9rem}
-.seg{border:0;padding:0;margin:0;display:flex;gap:.5rem;flex-wrap:wrap}
-.seg legend{font-weight:600;font-size:.9rem;padding:0;margin-bottom:.4rem}
-.seg label{display:inline-flex;align-items:center;gap:.4rem;font-weight:500;border:1.5px solid var(--line);border-radius:6px;padding:.4rem .7rem;cursor:pointer}
-.seg label:has(input:checked){border-color:var(--ink);background:var(--bg)}
-.row{display:flex;gap:.6rem;justify-content:flex-end;margin-top:.4rem}
-.empty{padding:1.6rem 1rem;text-align:center;color:var(--mut)}
-.cnt{margin:.8rem .7rem 0;font-size:.9rem}
-dialog{border:0;border-radius:10px;padding:1.4rem;width:min(30rem,92vw);background:var(--card);color:var(--ink);box-shadow:0 20px 60px #0008}
-dialog::backdrop{background:#0b1016b3}
-#toasts{position:fixed;left:1rem;bottom:1rem;z-index:9;display:grid;gap:.5rem;max-width:calc(100vw - 2rem)}
-.toast{background:var(--ink);color:var(--bg);padding:.7rem 1rem;border-radius:6px;font-weight:500}
-.toast.err{background:var(--g3);color:#fff}
-.foot{text-align:center;font-size:.9rem;margin:2rem 0 0}
-@media(max-width:560px){.pill{order:2}nav{order:3;flex-basis:100%}}
-</style>
-</head>
-<body>
-<header><div class="top">
-  <a class="plate" href="#painel">Zeladoria Urbana</a>
-  <nav>
-    <a href="#painel" data-v="painel">Painel</a>
-    <a href="#ocorrencias" data-v="ocorrencias">Ocorrências</a>
-    <a href="#categorias" data-v="categorias">Categorias</a>
-    <a href="#consultas" data-v="consultas">Bairros e problemas</a>
-  </nav>
-  <button id="st" class="pill" title="Atualizar dados" data-act="reload">Conectando…</button>
-</div></header>
-<div id="msg" hidden></div>
-<main id="app"></main>
-<dialog id="dlg"></dialog>
-<div id="toasts" aria-live="polite"></div>
-
-<script>
 const API = ""; // vazio = a tela é servida pela própria API (mesmo endereço)
 const GN = {1: "Baixo", 2: "Médio", 3: "Grave"};
 const VIEWS = ["painel", "ocorrencias", "categorias", "consultas"];
@@ -134,6 +39,7 @@ async function load() {
     }
     Object.assign(S, r, {erro: null, ok: true});
     st.className = "pill ok"; st.textContent = "API online";
+    $("#upd").textContent = "Atualizado às " + new Date().toLocaleTimeString("pt-BR", {hour: "2-digit", minute: "2-digit"}) + ".";
   } catch (e) {
     S.erro = e instanceof TypeError ? "Não consegui falar com a API. Confira se ela está no ar e tente de novo." : e.message;
     st.className = "pill off"; st.textContent = "API offline";
@@ -154,7 +60,8 @@ function painel() {
     <p class="mut">em ${Object.keys(count(at, "bairro")).length} bairros. ${S.o.length - n} já foram resolvidas.</p></div></section>
     <div class="road" role="img" aria-label="Ocorrências ativas por gravidade">${n ? gc.map((q, i) => q ? `<b style="width:${q / n * 100}%;background:var(--g${i + 1})"></b>` : "").join("") : ""}</div>
     <div class="legend">${[1, 2, 3].map(g => `<span>${shape(g)} <b>${gc[g - 1]}</b></span>`).join("")}</div>
-    <div class="cols">${rank("bairro", "Bairros com mais ocorrências")}${rank("problema", "Problemas mais frequentes")}</div>
+    <div class="kpis">${[["var(--blue)", S.o.length, "Ocorrências registradas"], ["var(--g1)", (S.o.length ? Math.round((S.o.length - n) / S.o.length * 100) : 0) + "%", "Taxa de resolução"], ["var(--g3)", gc[2], "Graves ativas"], ["var(--mut)", S.c.length, "Categorias cadastradas"]].map(([c, v, t]) => `<div class="kpi" style="--c:${c}"><b>${v}</b><span>${t}</span></div>`).join("")}</div>
+    <div class="cols">${rank("bairro", "Bairros com mais ocorrências")}${rank("problema", "Problemas mais frequentes")}${recentes()}</div>
     <a class="btn main" href="#ocorrencias">Ver ocorrências</a>`;
 }
 
@@ -174,7 +81,7 @@ function lista() {
   const r = S.o.filter(o => (!q || (o.problema + " " + o.bairro).toLowerCase().includes(q)) && (!f.b || o.bairro === f.b) && (!f.g || o.gravidade == f.g) && (f.s === "" || o.ativo === (f.s === "1"))).sort((a, b) => b.id - a.id);
   $("#lista").innerHTML = r.length
     ? `<table><thead><tr><th>Nº</th><th>Problema</th><th>Bairro</th><th>Gravidade</th><th>Situação</th><th><span class="sr">Ações</span></th></tr></thead><tbody>` +
-      r.map(o => `<tr><td><span class="no">${o.id}</span></td><td>${esc(o.problema)}</td><td>${esc(o.bairro)}</td><td>${shape(o.gravidade)}</td><td>${o.ativo ? "Ativa" : "Resolvida"}</td><td><button class="btn del sm" data-act="del-o" data-id="${o.id}">Apagar</button></td></tr>`).join("") +
+      r.map(o => `<tr><td><span class="no">${o.id}</span></td><td>${esc(o.problema)}</td><td>${esc(o.bairro)}</td><td>${shape(o.gravidade)}</td><td><span class="st ${o.ativo ? "a" : "r"}">${o.ativo ? "Ativa" : "Resolvida"}</span></td><td><button class="btn del sm" data-act="del-o" data-id="${o.id}">Apagar</button></td></tr>`).join("") +
       `</tbody></table><p class="mut cnt">${r.length} de ${S.o.length} ocorrências</p>`
     : `<p class="empty">${S.o.length ? "Nenhuma ocorrência com esses filtros." : "Nenhuma ocorrência registrada. Use “Nova ocorrência” para criar a primeira."}</p>`;
 }
@@ -208,11 +115,12 @@ function render() {
   document.querySelectorAll("nav a").forEach(a => a.setAttribute("aria-current", a.dataset.v === S.view ? "page" : "false"));
   $("#app").innerHTML = S.erro
     ? `<section class="card"><h1>Sem acesso aos dados</h1><p>${esc(S.erro)}</p><button class="btn main" data-act="reload">Tentar de novo</button></section>`
-    : !S.ok ? `<p class="empty">Carregando…</p>` : V[S.view]();
+    : !S.ok ? `<div class="sk"></div><div class="sk" style="margin-top:1rem"></div>` : V[S.view]();
   if (!S.erro && S.ok && S.view === "ocorrencias") lista();
+  const h = $(".hero .big"); if (h) countUp(h, +h.textContent);
 }
 
-function route() { const h = location.hash.slice(1); S.view = VIEWS.includes(h) ? h : "painel"; render(); }
+function route() { const h = location.hash.slice(1); S.view = VIEWS.includes(h) ? h : "painel"; $("#app").classList.add("anim"); render(); setTimeout(() => $("#app").classList.remove("anim"), 700); }
 
 function confirmar(texto, fn) {
   const d = $("#dlg");
@@ -286,6 +194,25 @@ document.addEventListener("submit", async e => {
 addEventListener("hashchange", () => { route(); scrollTo(0, 0); });
 route();
 load();
-</script>
-</body>
-</html>
+
+function countUp(el, n) {
+  if (matchMedia("(prefers-reduced-motion:reduce)").matches) return;
+  let t0;
+  const passo = t => { t0 = t0 ?? t; const p = Math.min((t - t0) / 700, 1); el.textContent = Math.round(n * (1 - (1 - p) ** 3)); if (p < 1) requestAnimationFrame(passo); };
+  requestAnimationFrame(passo);
+}
+
+function recentes() {
+  return `<section class="card"><h2>Últimas ocorrências</h2>` + (S.o.length
+    ? S.o.slice().sort((a, b) => b.id - a.id).slice(0, 5).map(o => `<div class="rk"><span><span class="no sm">${o.id}</span>${esc(o.problema)}, ${esc(o.bairro)}</span>${shape(o.gravidade)}</div>`).join("")
+    : `<p class="empty">Nada registrado ainda.</p>`) + `</section>`;
+}
+
+// tema claro/escuro (lembra a escolha)
+const raiz = document.documentElement;
+try { if (localStorage.getItem("tema")) raiz.dataset.theme = localStorage.getItem("tema"); } catch (e) {}
+$("#tm").onclick = () => {
+  const escuro = raiz.dataset.theme ? raiz.dataset.theme === "dark" : matchMedia("(prefers-color-scheme:dark)").matches;
+  raiz.dataset.theme = escuro ? "light" : "dark";
+  try { localStorage.setItem("tema", raiz.dataset.theme); } catch (e) {}
+};
