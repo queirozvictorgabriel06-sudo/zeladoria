@@ -26,6 +26,9 @@ def create_bairro(bairro):
     except Exception as e:
         conexao.rollback()
         print(f'Erro ao criar bairro {e}')
+    finally:
+        cursor.close()
+        conexao.close()
 
 
 def read_bairro():
@@ -45,6 +48,9 @@ def read_bairro():
     except Exception as e:
         conexao.rollback()
         print(f"Erro ao ler bairros {e}")
+    finally:
+        cursor.close()
+        conexao.close()
 
 
 
@@ -61,6 +67,9 @@ def update_bairro(novo_bairro, id_bairro):
     except Exception as e:
         conexao.rollback()
         print(f"Erro ao atualizar {e}")
+    finally:
+        cursor.close()
+        conexao.close()
 
 
 def delete_bairro(id_bairro):
@@ -75,3 +84,6 @@ def delete_bairro(id_bairro):
     except Exception as e:
         conexao.rollback()
         print(f"Erro ao excluir bairro {e}")
+    finally:
+        cursor.close()
+        conexao.close()

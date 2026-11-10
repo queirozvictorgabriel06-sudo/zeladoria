@@ -25,6 +25,9 @@ def create_problema(problema):
     except Exception as e:
         conexao.rollback()
         print(f'Erro ao colocar problema {e}')
+    finally:
+        cursor.close()
+        conexao.close()
 
 
 def read_problema():
@@ -44,6 +47,9 @@ def read_problema():
     except Exception as e:
         conexao.rollback()
         print(f'Erro ao ler problemas {e}')
+    finally:
+        cursor.close()
+        conexao.close()
 
 
 def update_problema(novo_problema, id_problema):
@@ -59,6 +65,9 @@ def update_problema(novo_problema, id_problema):
     except Exception as e:
         conexao.rollback()
         print(f'Erro ao atualizar o problema {e}')
+    finally:
+        cursor.close()
+        conexao.close()
 
 
 def delete_problema(id_problema):
@@ -73,3 +82,6 @@ def delete_problema(id_problema):
     except Exception as e:
         conexao.rollback()
         print(f'Erro ao deletar o problema {e}')
+    finally:
+        cursor.close()
+        conexao.close()

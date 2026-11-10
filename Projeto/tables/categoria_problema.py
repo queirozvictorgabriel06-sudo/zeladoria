@@ -28,6 +28,9 @@ def create_categoria_problema(id_problema, gravidade):
         conexao.rollback()
         print(f'Erro ao criar dados {e}')
         return False
+    finally:
+        cursor.close()
+        conexao.close()
 
 
 def read_categoria_problema():
@@ -48,6 +51,9 @@ def read_categoria_problema():
     except Exception as e:
         conexao.rollback()
         print(F'Erro ao ler dados {e}')
+    finally:
+        cursor.close()
+        conexao.close()
 
 
 def update_categoria_problema(nova_gravidade, id_categoria):
@@ -63,6 +69,9 @@ def update_categoria_problema(nova_gravidade, id_categoria):
     except Exception as e:
         conexao.rollback()
         print(f'Erro ao atualizar dados {e}')
+    finally:
+        cursor.close()
+        conexao.close()
 
 
 def delete_categoria_problema(id_categoria):
@@ -83,3 +92,6 @@ def delete_categoria_problema(id_categoria):
         conexao.rollback()
         print(f'Erro ao apagar dados {e}')
         return False
+    finally:
+        cursor.close()
+        conexao.close()

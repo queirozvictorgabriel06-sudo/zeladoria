@@ -30,6 +30,9 @@ def create_ocorrencias(id_categoria, id_bairro):
         conexao.rollback()
         print(F'Erro ao criar ocorrencias {e}')
         return False
+    finally:
+        cursor.close()
+        conexao.close()
 
 
 def read_ocorrencias():
@@ -64,6 +67,9 @@ def read_ocorrencias():
     except Exception as e:
         conexao.rollback()
         print(f"Erro ao ler ocorrências: {e}")
+    finally:
+        cursor.close()
+        conexao.close()
 
 
 def update_ocorrencias(id_ocorrencias):
@@ -79,6 +85,9 @@ def update_ocorrencias(id_ocorrencias):
     except Exception as e:
         conexao.rollback()
         print(f'Erro ao atualizar ocorrencias {e}')
+    finally:
+        cursor.close()
+        conexao.close()
 
 
 def delete_ocorrencias(id_ocorrencia):
@@ -99,3 +108,6 @@ def delete_ocorrencias(id_ocorrencia):
         conexao.rollback()
         print(f'Erro ao deletar ocorrencia {e}')
         return False
+    finally:
+        cursor.close()
+        conexao.close()
