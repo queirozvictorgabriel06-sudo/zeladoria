@@ -39,9 +39,17 @@ async function load() {
     }
     Object.assign(S, r, {erro: null, ok: true});
     st.className = "pill ok"; st.textContent = "API online";
-    $("#upd").textContent = "Atualizado às " + new Date().toLocaleTimeString("pt-BR", {hour: "2-digit", minute: "2-digit"}) + ".";
+    
+    // Correção: verifica se o elemento #upd existe antes de atualizar o texto
+    const upd = $("#upd");
+    if (upd) {
+      upd.textContent = "Atualizado às " + new Date().toLocaleTimeString("pt-BR", {hour: "2-digit", minute: "2-digit"}) + ".";
+    }
   } catch (e) {
-    S.erro = e instanceof TypeError ? "Não consegui falar com a API. Confira se ela está no ar e tente de novo." : e.message;
+    console.error("Erro no load:", e);
+    // Correção: filtra apenas erros reais de fetch/rede
+    const eRede = e instanceof TypeError && (e.message.includes("fetch") || e.message.includes("NetworkError"));
+    S.erro = eRede ? "Não consegui falar com a API. Confira se ela está no ar e tente de novo." : e.message;
     st.className = "pill off"; st.textContent = "API offline";
   }
   render();
