@@ -44,8 +44,8 @@ def read_categoria_problema():
     conexao = get_connection()
     cursor = conexao.cursor()
     try:
-        sql = (
-            "SELECT categoria_problema.id, problema.problema, categoria_problema.gravidade "
+        sql =(
+            "SELECT categoria_problema.id, categoria_problema.id_problema, problema.problema, categoria_problema.gravidade "
             "FROM categoria_problema "
             "JOIN problema ON categoria_problema.id_problema = problema.id "
         )
@@ -54,10 +54,10 @@ def read_categoria_problema():
         lista_categoria_problemas = []
 
         for categoria in resultados:
-            id_categoria_problema, problema, gravidade = categoria
+            id_categoria_problema, id_problema, problema, gravidade = categoria
             lista_categoria_problemas.append({
                 "id": id_categoria_problema,
-                "id_problema": id_categoria_problema,
+                "id_problema": id_problema,
                 "problema": problema,
                 "gravidade": gravidade
             })
