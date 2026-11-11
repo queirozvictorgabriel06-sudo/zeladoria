@@ -1,6 +1,9 @@
-from database import conexao, cursor
+from database import get_connection
+
 
 def tabela_bairro():
+    conexao = get_connection()
+    cursor = conexao.cursor()
     sql = (
         "CREATE TABLE IF NOT EXISTS bairros (" 
         "id SERIAL PRIMARY KEY, " 
@@ -9,9 +12,13 @@ def tabela_bairro():
     )
     cursor.execute(sql)
     conexao.commit()
+    cursor.close()
+    conexao.close()
 
 
 def create_bairro(bairro):
+    conexao = get_connection()
+    cursor = conexao.cursor()
     try:
         sql = (
             "INSERT INTO bairros "
@@ -21,7 +28,6 @@ def create_bairro(bairro):
         )
         cursor.execute(sql, (bairro, ))
         conexao.commit()
-
         return {"bairro": bairro}
     except Exception as e:
         conexao.rollback()
@@ -32,6 +38,8 @@ def create_bairro(bairro):
 
 
 def read_bairro():
+    conexao = get_connection()
+    cursor = conexao.cursor()
     try:
         sql = (
             "SELECT * FROM bairros "
@@ -53,8 +61,9 @@ def read_bairro():
         conexao.close()
 
 
-
 def update_bairro(novo_bairro, id_bairro):
+    conexao = get_connection()
+    cursor = conexao.cursor()
     try:
         sql = (
             "UPDATE bairros "
@@ -63,7 +72,7 @@ def update_bairro(novo_bairro, id_bairro):
         )
         cursor.execute(sql, (novo_bairro, id_bairro))
         conexao.commit()
-        return {"novo_bairro": novo_bairro, "id":id_bairro}
+        return {"novo_bairro": novo_bairro, "id": id_bairro}
     except Exception as e:
         conexao.rollback()
         print(f"Erro ao atualizar {e}")
@@ -73,6 +82,8 @@ def update_bairro(novo_bairro, id_bairro):
 
 
 def delete_bairro(id_bairro):
+    conexao = get_connection()
+    cursor = conexao.cursor()
     try:
         sql = (
             "DELETE FROM bairros "
@@ -80,7 +91,7 @@ def delete_bairro(id_bairro):
         )
         cursor.execute(sql, (id_bairro, ))
         conexao.commit()
-        return {"id_bairro": id_bairro, "status": "detado"}
+        return {"id_bairro": id_bairro, "status": "Deletado"}
     except Exception as e:
         conexao.rollback()
         print(f"Erro ao excluir bairro {e}")

@@ -1,6 +1,9 @@
-from database import conexao, cursor
+from database import get_connection
+
 
 def tabela_ocorrencias():
+    conexao = get_connection()
+    cursor = conexao.cursor()
     sql = (
         "CREATE TABLE IF NOT EXISTS ocorrencias ("
         "id SERIAL PRIMARY KEY, "
@@ -13,9 +16,13 @@ def tabela_ocorrencias():
     )
     cursor.execute(sql)
     conexao.commit()
+    cursor.close()
+    conexao.close()
 
 
 def create_ocorrencias(id_categoria, id_bairro):
+    conexao = get_connection()
+    cursor = conexao.cursor()
     try:
         sql = (
             "INSERT INTO ocorrencias "
@@ -28,7 +35,7 @@ def create_ocorrencias(id_categoria, id_bairro):
         return {"id_categoria": id_categoria, "id_bairro": id_bairro, "ativo": True}
     except Exception as e:
         conexao.rollback()
-        print(F'Erro ao criar ocorrencias {e}')
+        print(f'Erro ao criar ocorrencias {e}')
         return False
     finally:
         cursor.close()
@@ -36,6 +43,8 @@ def create_ocorrencias(id_categoria, id_bairro):
 
 
 def read_ocorrencias():
+    conexao = get_connection()
+    cursor = conexao.cursor()
     try:
         sql = (
             "SELECT "
@@ -73,6 +82,8 @@ def read_ocorrencias():
 
 
 def update_ocorrencias(id_ocorrencias):
+    conexao = get_connection()
+    cursor = conexao.cursor()
     try:
         sql = (
             "UPDATE ocorrencias "
@@ -91,6 +102,8 @@ def update_ocorrencias(id_ocorrencias):
 
 
 def delete_ocorrencias(id_ocorrencia):
+    conexao = get_connection()
+    cursor = conexao.cursor()
     try:
         sql = (
             "DELETE FROM ocorrencias "

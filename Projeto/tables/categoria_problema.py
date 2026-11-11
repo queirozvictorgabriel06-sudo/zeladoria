@@ -1,6 +1,9 @@
-from  database import conexao,cursor
+from database import get_connection
+
 
 def tabela_categoria_problema():
+    conexao = get_connection()
+    cursor = conexao.cursor()
     sql = (
         "CREATE TABLE IF NOT EXISTS categoria_problema ("
         "id SERIAL PRIMARY KEY, " 
@@ -11,9 +14,13 @@ def tabela_categoria_problema():
     )
     cursor.execute(sql)
     conexao.commit()
+    cursor.close()
+    conexao.close()
 
 
 def create_categoria_problema(id_problema, gravidade):
+    conexao = get_connection()
+    cursor = conexao.cursor()
     try:
         sql = (
             "INSERT INTO categoria_problema "
@@ -34,8 +41,10 @@ def create_categoria_problema(id_problema, gravidade):
 
 
 def read_categoria_problema():
+    conexao = get_connection()
+    cursor = conexao.cursor()
     try:
-        sql =(
+        sql = (
             "SELECT categoria_problema.id, problema.problema, categoria_problema.gravidade "
             "FROM categoria_problema "
             "JOIN problema ON categoria_problema.id_problema = problema.id "
@@ -46,17 +55,24 @@ def read_categoria_problema():
 
         for categoria in resultados:
             id_categoria_problema, problema, gravidade = categoria
-            lista_categoria_problemas.append({"id_categoria_problema": id_categoria_problema, "problema": problema, "gravidade":gravidade})
+            lista_categoria_problemas.append({
+                "id": id_categoria_problema,
+                "id_problema": id_categoria_problema,
+                "problema": problema,
+                "gravidade": gravidade
+            })
         return lista_categoria_problemas
     except Exception as e:
         conexao.rollback()
-        print(F'Erro ao ler dados {e}')
+        print(f'Erro ao ler dados {e}')
     finally:
         cursor.close()
         conexao.close()
 
 
 def update_categoria_problema(nova_gravidade, id_categoria):
+    conexao = get_connection()
+    cursor = conexao.cursor()
     try:
         sql = (
             "UPDATE categoria_problema "
@@ -75,6 +91,8 @@ def update_categoria_problema(nova_gravidade, id_categoria):
 
 
 def delete_categoria_problema(id_categoria):
+    conexao = get_connection()
+    cursor = conexao.cursor()
     try:
         sql = (
             "DELETE FROM categoria_problema "

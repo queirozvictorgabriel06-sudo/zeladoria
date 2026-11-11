@@ -1,6 +1,9 @@
-from database import conexao, cursor
+from database import get_connection
+
 
 def tabela_problema():
+    conexao = get_connection()
+    cursor = conexao.cursor()
     sql = (
         "CREATE TABLE IF NOT EXISTS problema (" 
         "id SERIAL PRIMARY KEY, "
@@ -9,8 +12,13 @@ def tabela_problema():
     )
     cursor.execute(sql)
     conexao.commit()
+    cursor.close()
+    conexao.close()
+
 
 def create_problema(problema):
+    conexao = get_connection()
+    cursor = conexao.cursor()
     try:
         sql = (
             "INSERT INTO problema "
@@ -20,7 +28,6 @@ def create_problema(problema):
         )
         cursor.execute(sql, (problema, ))
         conexao.commit()
-
         return {"problema": problema}
     except Exception as e:
         conexao.rollback()
@@ -31,6 +38,8 @@ def create_problema(problema):
 
 
 def read_problema():
+    conexao = get_connection()
+    cursor = conexao.cursor()
     try:
         sql = (
             "SELECT * FROM problema "
@@ -53,6 +62,8 @@ def read_problema():
 
 
 def update_problema(novo_problema, id_problema):
+    conexao = get_connection()
+    cursor = conexao.cursor()
     try:
         sql = (
             "UPDATE problema "
@@ -71,6 +82,8 @@ def update_problema(novo_problema, id_problema):
 
 
 def delete_problema(id_problema):
+    conexao = get_connection()
+    cursor = conexao.cursor()
     try:
         sql = (
             "DELETE FROM problema "
@@ -85,3 +98,4 @@ def delete_problema(id_problema):
     finally:
         cursor.close()
         conexao.close()
+
