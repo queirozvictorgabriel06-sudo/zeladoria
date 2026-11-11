@@ -21,7 +21,6 @@ app.add_middleware(
 
 
 
-
 app.include_router(consultas.router)
 app.include_router(ocorrencias.router)
 app.include_router(categorias.router)
