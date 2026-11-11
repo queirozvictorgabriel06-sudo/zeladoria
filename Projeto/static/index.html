@@ -1,0 +1,1608 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zeladoria Urbana</title>
+  <style>
+    /* ============================================================
+       RESET & BASE
+    ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --green-50:  #f0fdf4;
+      --green-100: #dcfce7;
+      --green-200: #bbf7d0;
+      --green-400: #4ade80;
+      --green-500: #22c55e;
+      --green-600: #16a34a;
+      --green-700: #15803d;
+      --green-800: #166534;
+      --green-900: #14532d;
+
+      --yellow-100: #fef9c3;
+      --yellow-400: #facc15;
+      --yellow-600: #ca8a04;
+
+      --red-100:   #fee2e2;
+      --red-400:   #f87171;
+      --red-500:   #ef4444;
+      --red-600:   #dc2626;
+
+      --blue-100:  #dbeafe;
+      --blue-500:  #3b82f6;
+
+      --slate-50:  #f8fafc;
+      --slate-100: #f1f5f9;
+      --slate-200: #e2e8f0;
+      --slate-300: #cbd5e1;
+      --slate-400: #94a3b8;
+      --slate-500: #64748b;
+      --slate-600: #475569;
+      --slate-700: #334155;
+      --slate-800: #1e293b;
+      --slate-900: #0f172a;
+
+      --sidebar-w: 260px;
+      --header-h: 64px;
+      --radius:    10px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+      --shadow:    0 4px 6px -1px rgba(0,0,0,.1), 0 2px 4px -1px rgba(0,0,0,.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -2px rgba(0,0,0,.05);
+    }
+    html { font-size: 15px; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--slate-100);
+      color: var(--slate-800);
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* ============================================================
+       SIDEBAR
+    ============================================================ */
+    .sidebar {
+      width: var(--sidebar-w);
+      min-height: 100vh;
+      background: var(--green-800);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      z-index: 100;
+      transition: transform .25s ease;
+    }
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 22px 20px 18px;
+      border-bottom: 1px solid rgba(255,255,255,.12);
+    }
+    .sidebar-logo .logo-icon {
+      width: 38px; height: 38px;
+      background: var(--green-500);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+    }
+    .sidebar-logo .logo-text {
+      color: #fff;
+      font-weight: 700;
+      font-size: 15px;
+      line-height: 1.2;
+    }
+    .sidebar-logo .logo-sub { color: var(--green-200); font-size: 11px; font-weight: 400; }
+
+    nav { padding: 14px 10px; flex: 1; }
+    .nav-label {
+      color: var(--green-300);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      padding: 8px 10px 4px;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      color: var(--green-100);
+      font-size: 14px;
+      font-weight: 500;
+      transition: background .15s;
+      margin-bottom: 2px;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+    }
+    .nav-item:hover { background: rgba(255,255,255,.1); }
+    .nav-item.active { background: var(--green-600); color: #fff; }
+    .nav-item .icon { font-size: 17px; width: 20px; text-align: center; flex-shrink: 0; }
+    .nav-item .badge {
+      margin-left: auto;
+      background: var(--green-500);
+      color: #fff;
+      border-radius: 999px;
+      font-size: 11px;
+      padding: 1px 7px;
+      font-weight: 700;
+    }
+
+    .sidebar-footer {
+      padding: 14px 20px 20px;
+      border-top: 1px solid rgba(255,255,255,.12);
+    }
+    .api-status {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 12px; color: var(--green-200);
+    }
+    .api-status .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--green-400);
+      flex-shrink: 0;
+      animation: pulse 2s infinite;
+    }
+    .api-status .dot.offline { background: var(--red-400); animation: none; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+    /* ============================================================
+       MAIN LAYOUT
+    ============================================================ */
+    .main {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* TOPBAR */
+    .topbar {
+      height: var(--header-h);
+      background: #fff;
+      border-bottom: 1px solid var(--slate-200);
+      display: flex;
+      align-items: center;
+      padding: 0 28px;
+      gap: 16px;
+      position: sticky; top: 0; z-index: 50;
+      box-shadow: var(--shadow-sm);
+    }
+    .topbar-title { font-size: 17px; font-weight: 700; color: var(--slate-800); flex: 1; }
+    .topbar-subtitle { font-size: 12px; color: var(--slate-400); font-weight: 400; }
+    .btn-refresh {
+      background: var(--slate-100);
+      border: 1px solid var(--slate-200);
+      border-radius: 8px;
+      padding: 7px 14px;
+      font-size: 13px;
+      color: var(--slate-600);
+      cursor: pointer;
+      display: flex; align-items: center; gap: 6px;
+      transition: background .15s;
+    }
+    .btn-refresh:hover { background: var(--slate-200); }
+    .hamburger {
+      display: none;
+      background: none; border: none; cursor: pointer;
+      font-size: 22px; color: var(--slate-700);
+    }
+
+    /* PAGE CONTENT */
+    .page { display: none; padding: 28px; }
+    .page.active { display: block; }
+
+    /* ============================================================
+       CARDS / STATS
+    ============================================================ */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+    .stat-card {
+      background: #fff;
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--slate-200);
+      display: flex; align-items: flex-start; gap: 14px;
+    }
+    .stat-icon {
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+    .stat-icon.green  { background: var(--green-100);  }
+    .stat-icon.yellow { background: var(--yellow-100); }
+    .stat-icon.red    { background: var(--red-100);    }
+    .stat-icon.blue   { background: var(--blue-100);   }
+    .stat-info { flex: 1; }
+    .stat-value { font-size: 26px; font-weight: 800; color: var(--slate-800); line-height: 1; }
+    .stat-label { font-size: 12px; color: var(--slate-500); margin-top: 4px; }
+
+    /* ============================================================
+       PANELS (cards with header)
+    ============================================================ */
+    .panel {
+      background: #fff;
+      border-radius: var(--radius);
+      border: 1px solid var(--slate-200);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+    .panel-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--slate-100);
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .panel-title {
+      font-size: 15px; font-weight: 700;
+      color: var(--slate-800);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .panel-title .ico { font-size: 16px; }
+    .panel-body { padding: 20px; }
+
+    /* ============================================================
+       TABLE
+    ============================================================ */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+    thead tr { background: var(--slate-50); }
+    th {
+      text-align: left;
+      padding: 10px 14px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--slate-500);
+      font-weight: 700;
+      border-bottom: 1px solid var(--slate-200);
+      white-space: nowrap;
+    }
+    td {
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--slate-100);
+      color: var(--slate-700);
+      vertical-align: middle;
+    }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: var(--slate-50); }
+
+    /* ============================================================
+       BADGES & GRAVIDADE
+    ============================================================ */
+    .badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-size: 11.5px;
+      font-weight: 600;
+    }
+    .badge-green  { background: var(--green-100);  color: var(--green-700); }
+    .badge-yellow { background: var(--yellow-100); color: var(--yellow-600); }
+    .badge-red    { background: var(--red-100);    color: var(--red-600); }
+    .badge-blue   { background: var(--blue-100);   color: var(--blue-500); }
+    .badge-gray   { background: var(--slate-100);  color: var(--slate-500); }
+
+    /* ============================================================
+       BUTTONS
+    ============================================================ */
+    .btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: filter .15s, transform .1s;
+    }
+    .btn:active { transform: scale(.97); }
+    .btn-primary   { background: var(--green-600); color: #fff; }
+    .btn-primary:hover   { filter: brightness(1.08); }
+    .btn-danger    { background: var(--red-500); color: #fff; }
+    .btn-danger:hover    { filter: brightness(1.08); }
+    .btn-outline   {
+      background: transparent;
+      border: 1px solid var(--slate-300);
+      color: var(--slate-600);
+    }
+    .btn-outline:hover { background: var(--slate-100); }
+    .btn-sm { padding: 5px 10px; font-size: 12px; }
+
+    /* ============================================================
+       FORMS
+    ============================================================ */
+    .form-grid { display: grid; gap: 16px; }
+    .form-grid.cols-2 { grid-template-columns: 1fr 1fr; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    label { font-size: 13px; font-weight: 600; color: var(--slate-700); }
+    .hint { font-size: 11.5px; color: var(--slate-400); margin-top: 2px; }
+    input, select, textarea {
+      padding: 9px 12px;
+      border: 1px solid var(--slate-300);
+      border-radius: 8px;
+      font-size: 13.5px;
+      color: var(--slate-800);
+      background: #fff;
+      outline: none;
+      transition: border-color .15s, box-shadow .15s;
+      width: 100%;
+      font-family: inherit;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--green-500);
+      box-shadow: 0 0 0 3px rgba(34,197,94,.15);
+    }
+    input.error, select.error { border-color: var(--red-500); }
+    .field-error { color: var(--red-500); font-size: 11.5px; margin-top: 2px; }
+
+    /* ============================================================
+       GRAVIDADE SELECTOR
+    ============================================================ */
+    .grav-options { display: flex; gap: 10px; flex-wrap: wrap; }
+    .grav-opt {
+      flex: 1; min-width: 90px;
+      border: 2px solid var(--slate-200);
+      border-radius: 10px;
+      padding: 12px 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: all .15s;
+      background: #fff;
+    }
+    .grav-opt .grav-emoji { font-size: 22px; }
+    .grav-opt .grav-label { font-size: 12px; font-weight: 700; margin-top: 4px; }
+    .grav-opt .grav-num   { font-size: 11px; color: var(--slate-400); }
+    .grav-opt:hover { border-color: var(--slate-400); }
+    .grav-opt.sel-1 { border-color: var(--green-500);  background: var(--green-50); }
+    .grav-opt.sel-2 { border-color: var(--yellow-400); background: var(--yellow-100); }
+    .grav-opt.sel-3 { border-color: var(--red-500);    background: var(--red-100); }
+
+    /* ============================================================
+       EMPTY STATE
+    ============================================================ */
+    .empty {
+      text-align: center;
+      padding: 48px 20px;
+      color: var(--slate-400);
+    }
+    .empty .empty-icon { font-size: 48px; margin-bottom: 10px; }
+    .empty p { font-size: 14px; }
+
+    /* ============================================================
+       LOADING SPINNER
+    ============================================================ */
+    .spinner-wrap {
+      display: flex; align-items: center; justify-content: center;
+      padding: 40px;
+    }
+    .spinner {
+      width: 32px; height: 32px;
+      border: 3px solid var(--slate-200);
+      border-top-color: var(--green-500);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ============================================================
+       TOAST NOTIFICATIONS
+    ============================================================ */
+    #toast-container {
+      position: fixed;
+      bottom: 24px; right: 24px;
+      display: flex; flex-direction: column; gap: 10px;
+      z-index: 9999;
+      pointer-events: none;
+    }
+    .toast {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--slate-800);
+      color: #fff;
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-size: 13.5px;
+      box-shadow: var(--shadow-lg);
+      animation: slideUp .3s ease;
+      pointer-events: all;
+      max-width: 340px;
+    }
+    .toast.success { background: var(--green-700); }
+    .toast.error   { background: var(--red-600); }
+    .toast.warning { background: #b45309; }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ============================================================
+       MODAL
+    ============================================================ */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.45);
+      z-index: 500;
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+      display: none;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: #fff;
+      border-radius: 14px;
+      padding: 28px;
+      width: 100%; max-width: 500px;
+      box-shadow: var(--shadow-lg);
+      animation: modalIn .2s ease;
+    }
+    @keyframes modalIn {
+      from { opacity:0; transform: scale(.95); }
+      to   { opacity:1; transform: scale(1); }
+    }
+    .modal-title { font-size: 17px; font-weight: 700; margin-bottom: 20px; color: var(--slate-800); }
+    .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
+
+    /* ============================================================
+       SETTINGS
+    ============================================================ */
+    .settings-url-bar {
+      display: flex; gap: 10px; align-items: center;
+    }
+    .settings-url-bar input { flex: 1; font-family: monospace; font-size: 13px; }
+
+    /* ============================================================
+       DASHBOARD GRID
+    ============================================================ */
+    .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media(max-width: 900px) { .dash-grid { grid-template-columns: 1fr; } }
+
+    /* ============================================================
+       GRAVIDADE BAR CHART
+    ============================================================ */
+    .grav-chart { display: flex; flex-direction: column; gap: 12px; padding: 4px 0; }
+    .grav-row { display: flex; align-items: center; gap: 10px; }
+    .grav-row .grav-name { width: 70px; font-size: 12px; font-weight: 600; flex-shrink: 0; }
+    .grav-row .bar-bg {
+      flex: 1; height: 10px; background: var(--slate-100); border-radius: 999px; overflow: hidden;
+    }
+    .grav-row .bar-fill { height: 100%; border-radius: 999px; transition: width .5s ease; }
+    .grav-row .bar-fill.g1 { background: var(--green-500); }
+    .grav-row .bar-fill.g2 { background: var(--yellow-400); }
+    .grav-row .bar-fill.g3 { background: var(--red-500); }
+    .grav-row .bar-count { width: 28px; text-align: right; font-size: 12px; color: var(--slate-500); font-weight: 600; }
+
+    /* ============================================================
+       SEARCH
+    ============================================================ */
+    .search-box {
+      position: relative;
+    }
+    .search-box input {
+      padding-left: 34px;
+      width: 220px;
+    }
+    .search-box .search-icon {
+      position: absolute;
+      left: 10px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--slate-400);
+      font-size: 15px;
+      pointer-events: none;
+    }
+
+    /* ============================================================
+       RESPONSIVE
+    ============================================================ */
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .main { margin-left: 0; }
+      .hamburger { display: block; }
+      .form-grid.cols-2 { grid-template-columns: 1fr; }
+      .topbar { padding: 0 16px; }
+      .page { padding: 16px; }
+      .dash-grid { grid-template-columns: 1fr; }
+    }
+    .overlay-bg {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.35);
+      z-index: 90;
+    }
+    .overlay-bg.open { display: block; }
+
+    /* ============================================================
+       CONFIRM DELETE DIALOG
+    ============================================================ */
+    .confirm-modal {
+      max-width: 380px;
+    }
+    .confirm-modal p { font-size: 14px; color: var(--slate-600); line-height: 1.6; }
+    .confirm-modal strong { color: var(--slate-800); }
+  </style>
+</head>
+<body>
+
+<!-- ==================== SIDEBAR ==================== -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">🏙️</div>
+    <div class="logo-text">
+      Zeladoria
+      <div class="logo-sub">Sistema Urbano</div>
+    </div>
+  </div>
+
+  <nav>
+    <div class="nav-label">Principal</div>
+    <button class="nav-item active" onclick="navTo('dashboard')">
+      <span class="icon">📊</span> Dashboard
+    </button>
+    <button class="nav-item" onclick="navTo('ocorrencias')">
+      <span class="icon">📋</span> Ocorrências
+      <span class="badge" id="badge-ocorrencias">0</span>
+    </button>
+
+    <div class="nav-label" style="margin-top:10px">Gestão</div>
+    <button class="nav-item" onclick="navTo('categorias')">
+      <span class="icon">🗂️</span> Categorias
+    </button>
+    <button class="nav-item" onclick="navTo('bairros')">
+      <span class="icon">🏘️</span> Bairros
+    </button>
+    <button class="nav-item" onclick="navTo('problemas')">
+      <span class="icon">⚠️</span> Tipos de Problema
+    </button>
+
+    <div class="nav-label" style="margin-top:10px">Sistema</div>
+    <button class="nav-item" onclick="navTo('config')">
+      <span class="icon">⚙️</span> Configurações
+    </button>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="api-status" id="api-status-indicator">
+      <div class="dot" id="api-dot"></div>
+      <span id="api-status-text">Verificando API...</span>
+    </div>
+  </div>
+</aside>
+
+<!-- Mobile overlay -->
+<div class="overlay-bg" id="overlay-bg" onclick="closeSidebar()"></div>
+
+<!-- ==================== MAIN ==================== -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <button class="hamburger" onclick="toggleSidebar()">☰</button>
+    <div class="topbar-title">
+      <span id="page-title">Dashboard</span>
+      <div class="topbar-subtitle" id="page-sub">Visão geral do sistema</div>
+    </div>
+    <button class="btn-refresh" onclick="refreshCurrentPage()">
+      🔄 Atualizar
+    </button>
+  </header>
+
+  <!-- ============================================================
+       PAGE: DASHBOARD
+  ============================================================ -->
+  <div class="page active" id="page-dashboard">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon green">📋</div>
+        <div class="stat-info">
+          <div class="stat-value" id="stat-ocorrencias">—</div>
+          <div class="stat-label">Total de Ocorrências</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon red">🔥</div>
+        <div class="stat-info">
+          <div class="stat-value" id="stat-graves">—</div>
+          <div class="stat-label">Ocorrências Graves</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon green">✅</div>
+        <div class="stat-info">
+          <div class="stat-value" id="stat-ativas">—</div>
+          <div class="stat-label">Ativas</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon blue">🗂️</div>
+        <div class="stat-info">
+          <div class="stat-value" id="stat-categorias">—</div>
+          <div class="stat-label">Categorias Registadas</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dash-grid">
+      <!-- Últimas ocorrências -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title"><span class="ico">🕐</span> Últimas Ocorrências</div>
+          <button class="btn btn-outline btn-sm" onclick="navTo('ocorrencias')">Ver todas</button>
+        </div>
+        <div class="panel-body">
+          <div class="table-wrap">
+            <table id="dash-recent-table">
+              <thead>
+                <tr>
+                  <th>#</th><th>Bairro</th><th>Problema</th><th>Gravidade</th>
+                </tr>
+              </thead>
+              <tbody id="dash-recent-body">
+                <tr><td colspan="4"><div class="spinner-wrap"><div class="spinner"></div></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gravidade chart -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title"><span class="ico">📊</span> Distribuição por Gravidade</div>
+        </div>
+        <div class="panel-body">
+          <div class="grav-chart" id="dash-grav-chart">
+            <div class="spinner-wrap"><div class="spinner"></div></div>
+          </div>
+          <div style="margin-top:18px">
+            <div id="dash-bairro-ranking"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       PAGE: OCORRÊNCIAS
+  ============================================================ -->
+  <div class="page" id="page-ocorrencias">
+
+    <!-- FORM CRIAR -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title"><span class="ico">➕</span> Registar Nova Ocorrência</div>
+      </div>
+      <div class="panel-body">
+        <form id="form-ocorrencia" onsubmit="submitOcorrencia(event)">
+          <div class="form-grid cols-2">
+            <div class="form-group">
+              <label for="occ-categoria">Categoria de Problema</label>
+              <select id="occ-categoria" required>
+                <option value="">— Selecionar Categoria —</option>
+              </select>
+              <span class="hint">Selecione o tipo e gravidade do problema</span>
+            </div>
+            <div class="form-group">
+              <label for="occ-bairro">Bairro</label>
+              <select id="occ-bairro" required>
+                <option value="">— Selecionar Bairro —</option>
+              </select>
+            </div>
+          </div>
+          <div style="margin-top:16px; display:flex; justify-content:flex-end;">
+            <button type="submit" class="btn btn-primary" id="btn-submit-occ">
+              ✅ Registar Ocorrência
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- LISTAGEM -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title"><span class="ico">📋</span> Ocorrências Registadas</div>
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="occ-search" placeholder="Pesquisar..." oninput="filterOcorrencias()" />
+          </div>
+          <select id="occ-filter-grav" onchange="filterOcorrencias()" style="width:auto;padding:7px 12px;">
+            <option value="">Todas as gravidades</option>
+            <option value="1">🟢 Baixa</option>
+            <option value="2">🟡 Média</option>
+            <option value="3">🔴 Grave</option>
+          </select>
+          <select id="occ-filter-status" onchange="filterOcorrencias()" style="width:auto;padding:7px 12px;">
+            <option value="">Todos os status</option>
+            <option value="true">✅ Ativa</option>
+            <option value="false">⬜ Resolvida</option>
+          </select>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Bairro</th>
+              <th>Problema</th>
+              <th>Gravidade</th>
+              <th>Status</th>
+              <th style="text-align:right">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="occ-table-body">
+            <tr><td colspan="6"><div class="spinner-wrap"><div class="spinner"></div></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div id="occ-pagination" style="display:flex;justify-content:flex-end;align-items:center;gap:8px;padding:12px 20px;border-top:1px solid var(--slate-100);"></div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       PAGE: CATEGORIAS
+  ============================================================ -->
+  <div class="page" id="page-categorias">
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title"><span class="ico">➕</span> Nova Categoria de Problema</div>
+      </div>
+      <div class="panel-body">
+        <form id="form-categoria" onsubmit="submitCategoria(event)">
+          <div class="form-grid cols-2">
+            <div class="form-group">
+              <label for="cat-problema">Tipo de Problema</label>
+              <select id="cat-problema" required>
+                <option value="">— Selecionar Problema —</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Gravidade</label>
+              <div class="grav-options" id="grav-options">
+                <div class="grav-opt" data-val="1" onclick="selectGravidade(1)">
+                  <div class="grav-emoji">🟢</div>
+                  <div class="grav-label">Baixa</div>
+                  <div class="grav-num">Nível 1</div>
+                </div>
+                <div class="grav-opt" data-val="2" onclick="selectGravidade(2)">
+                  <div class="grav-emoji">🟡</div>
+                  <div class="grav-label">Média</div>
+                  <div class="grav-num">Nível 2</div>
+                </div>
+                <div class="grav-opt" data-val="3" onclick="selectGravidade(3)">
+                  <div class="grav-emoji">🔴</div>
+                  <div class="grav-label">Grave</div>
+                  <div class="grav-num">Nível 3</div>
+                </div>
+              </div>
+              <input type="hidden" id="cat-gravidade" value="" />
+              <span class="hint">Use apenas 1, 2 ou 3</span>
+            </div>
+          </div>
+          <div style="margin-top:16px;display:flex;justify-content:flex-end;">
+            <button type="submit" class="btn btn-primary">🗂️ Criar Categoria</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title"><span class="ico">🗂️</span> Categorias Existentes</div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>#</th><th>Problema</th><th>Gravidade</th><th style="text-align:right">Ações</th></tr>
+          </thead>
+          <tbody id="cat-table-body">
+            <tr><td colspan="4"><div class="spinner-wrap"><div class="spinner"></div></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       PAGE: BAIRROS
+  ============================================================ -->
+  <div class="page" id="page-bairros">
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title"><span class="ico">🏘️</span> Bairros Cadastrados</div>
+      </div>
+      <div class="panel-body">
+        <div id="bairros-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;">
+          <div class="spinner-wrap"><div class="spinner"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       PAGE: PROBLEMAS
+  ============================================================ -->
+  <div class="page" id="page-problemas">
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title"><span class="ico">⚠️</span> Tipos de Problema Cadastrados</div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>#</th><th>Problema</th></tr>
+          </thead>
+          <tbody id="prob-table-body">
+            <tr><td colspan="2"><div class="spinner-wrap"><div class="spinner"></div></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       PAGE: CONFIGURAÇÕES
+  ============================================================ -->
+  <div class="page" id="page-config">
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title"><span class="ico">🌐</span> URL da API (Render)</div>
+      </div>
+      <div class="panel-body">
+        <p style="font-size:13.5px;color:var(--slate-600);margin-bottom:14px;line-height:1.6;">
+          Informe a URL base da sua API hospedada no Render. Exemplo:
+          <code style="background:var(--slate-100);padding:2px 6px;border-radius:4px;font-size:12.5px;">https://zeladoria-api.onrender.com</code>
+        </p>
+        <div class="settings-url-bar">
+          <input type="text" id="config-url" placeholder="https://seu-app.onrender.com" />
+          <button class="btn btn-primary" onclick="saveApiUrl()">💾 Salvar</button>
+          <button class="btn btn-outline" onclick="testApiUrl()">🔌 Testar</button>
+        </div>
+        <div id="config-test-result" style="margin-top:12px;font-size:13px;"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title"><span class="ico">📡</span> Status da Conexão</div>
+      </div>
+      <div class="panel-body">
+        <div id="config-endpoints" style="display:flex;flex-direction:column;gap:10px;">
+          <div style="color:var(--slate-400);font-size:13px;">Clique em "Testar" para verificar os endpoints.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title"><span class="ico">ℹ️</span> Sobre o Sistema</div>
+      </div>
+      <div class="panel-body" style="font-size:13.5px;color:var(--slate-600);line-height:1.8;">
+        <p><strong>Zeladoria Urbana</strong> — Sistema de registo de problemas urbanos para cidadãos.</p>
+        <p style="margin-top:8px;">Backend: <strong>FastAPI + PostgreSQL (Neon)</strong> · Deploy: <strong>Render</strong></p>
+        <p>Versão da API: <strong>1.0.0</strong></p>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- ============================================================
+     TOAST CONTAINER
+============================================================ -->
+<div id="toast-container"></div>
+
+<!-- ============================================================
+     CONFIRM DELETE MODAL
+============================================================ -->
+<div class="modal-overlay" id="confirm-modal">
+  <div class="modal confirm-modal">
+    <div class="modal-title" id="confirm-title">Confirmar exclusão</div>
+    <p id="confirm-msg">Tem a certeza que deseja eliminar este item?</p>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeConfirm()">Cancelar</button>
+      <button class="btn btn-danger" id="btn-confirm-ok">🗑️ Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     JAVASCRIPT
+============================================================ -->
+<script>
+// ============================================================
+// CONFIG & STATE
+// ============================================================
+const DEFAULT_API = 'https://zeladoria.onrender.com';
+let API_BASE = localStorage.getItem('zeladoria_api_url') || DEFAULT_API;
+
+// Normalize URL (remove trailing slash)
+function normalize(url) { return url.replace(/\/+$/, ''); }
+
+// In-memory cache
+let cache = { ocorrencias: null, categorias: null, bairros: null, problemas: null };
+
+// Pagination state
+let occPage = 1;
+const OCC_PER_PAGE = 10;
+let occAll = [];
+
+// Confirm dialog callback
+let confirmCallback = null;
+
+// Selected gravidade
+let selectedGravidade = 0;
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+const pageMap = {
+  dashboard:  { title: 'Dashboard',          sub: 'Visão geral do sistema' },
+  ocorrencias:{ title: 'Ocorrências',        sub: 'Listagem e registo de ocorrências' },
+  categorias: { title: 'Categorias',         sub: 'Categorias de problemas (administrador)' },
+  bairros:    { title: 'Bairros',            sub: 'Bairros disponíveis no sistema' },
+  problemas:  { title: 'Tipos de Problema',  sub: 'Tipos de problemas cadastrados' },
+  config:     { title: 'Configurações',      sub: 'Configuração da API e do sistema' },
+};
+
+function navTo(page) {
+  // Deactivate all nav items and pages
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+
+  // Activate target
+  document.querySelector(`[onclick="navTo('${page}')"]`).classList.add('active');
+  document.getElementById(`page-${page}`).classList.add('active');
+
+  // Update topbar
+  const info = pageMap[page];
+  document.getElementById('page-title').textContent = info.title;
+  document.getElementById('page-sub').textContent   = info.sub;
+
+  // Load page data
+  loadPage(page);
+  closeSidebar();
+}
+
+function loadPage(page) {
+  if (page === 'dashboard')   loadDashboard();
+  if (page === 'ocorrencias') loadOcorrencias();
+  if (page === 'categorias')  { loadCategorias(); loadProblemasSelect(); }
+  if (page === 'bairros')     loadBairros();
+  if (page === 'problemas')   loadProblemas();
+  if (page === 'config')      initConfig();
+}
+
+function refreshCurrentPage() {
+  cache = { ocorrencias: null, categorias: null, bairros: null, problemas: null };
+  const active = document.querySelector('.page.active');
+  if (!active) return;
+  const page = active.id.replace('page-', '');
+  loadPage(page);
+  toast('Dados actualizados!', 'success');
+}
+
+// ============================================================
+// SIDEBAR MOBILE
+// ============================================================
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay-bg').classList.toggle('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay-bg').classList.remove('open');
+}
+
+// ============================================================
+// API HELPERS
+// ============================================================
+async function apiFetch(path, options = {}) {
+  const url = normalize(API_BASE) + path;
+  const res = await fetch(url, {
+    headers: { 'Content-Type': 'application/json', ...options.headers },
+    ...options,
+  });
+  if (!res.ok) {
+    let detail = `HTTP ${res.status}`;
+    try { const j = await res.json(); detail = j.detail || detail; } catch(e) {}
+    throw new Error(detail);
+  }
+  return res.json();
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function toast(msg, type = 'info', duration = 3500) {
+  const c = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️';
+  t.textContent = `${icon}  ${msg}`;
+  c.appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity .3s'; setTimeout(() => t.remove(), 350); }, duration);
+}
+
+// ============================================================
+// CONFIRM MODAL
+// ============================================================
+function openConfirm(title, msg, cb) {
+  document.getElementById('confirm-title').textContent = title;
+  document.getElementById('confirm-msg').textContent   = msg;
+  document.getElementById('confirm-modal').classList.add('open');
+  confirmCallback = cb;
+  document.getElementById('btn-confirm-ok').onclick = () => { cb(); closeConfirm(); };
+}
+function closeConfirm() {
+  document.getElementById('confirm-modal').classList.remove('open');
+  confirmCallback = null;
+}
+// Close on overlay click
+document.getElementById('confirm-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeConfirm();
+});
+
+// ============================================================
+// GRAVIDADE HELPERS
+// ============================================================
+function gravBadge(g) {
+  const map = {
+    1: `<span class="badge badge-green">🟢 Baixa</span>`,
+    2: `<span class="badge badge-yellow">🟡 Média</span>`,
+    3: `<span class="badge badge-red">🔴 Grave</span>`,
+  };
+  return map[g] || `<span class="badge badge-gray">${g}</span>`;
+}
+
+function statusBadge(ativo) {
+  return ativo
+    ? `<span class="badge badge-green">✅ Ativa</span>`
+    : `<span class="badge badge-gray">⬜ Resolvida</span>`;
+}
+
+function gravName(g) {
+  return { 1: 'Baixa', 2: 'Média', 3: 'Grave' }[g] || g;
+}
+
+// ============================================================
+// API STATUS CHECK
+// ============================================================
+async function checkApiStatus() {
+  const dot  = document.getElementById('api-dot');
+  const text = document.getElementById('api-status-text');
+  try {
+    await apiFetch('/bairros');
+    dot.classList.remove('offline');
+    text.textContent = 'API conectada';
+  } catch(e) {
+    dot.classList.add('offline');
+    text.textContent = 'API offline';
+  }
+}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+async function loadDashboard() {
+  try {
+    const [ocorrencias, categorias] = await Promise.all([
+      cache.ocorrencias || apiFetch('/ocorrencias/'),
+      cache.categorias  || apiFetch('/categorias/'),
+    ]);
+    cache.ocorrencias = ocorrencias;
+    cache.categorias  = categorias;
+
+    const total  = ocorrencias.length;
+    const graves = ocorrencias.filter(o => o.gravidade === 3).length;
+    const ativas = ocorrencias.filter(o => o.ativo).length;
+
+    document.getElementById('stat-ocorrencias').textContent = total;
+    document.getElementById('stat-graves').textContent      = graves;
+    document.getElementById('stat-ativas').textContent      = ativas;
+    document.getElementById('stat-categorias').textContent  = categorias.length;
+
+    // Update badge
+    document.getElementById('badge-ocorrencias').textContent = total;
+
+    // Recent occurrences (last 5)
+    const recent = [...ocorrencias].reverse().slice(0, 5);
+    const tbody  = document.getElementById('dash-recent-body');
+    if (recent.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="4"><div class="empty"><div class="empty-icon">📭</div><p>Nenhuma ocorrência registada.</p></div></td></tr>`;
+    } else {
+      tbody.innerHTML = recent.map(o => `
+        <tr>
+          <td><span style="font-weight:700;color:var(--slate-500)">#${o.id}</span></td>
+          <td>${o.bairro}</td>
+          <td>${o.problema}</td>
+          <td>${gravBadge(o.gravidade)}</td>
+        </tr>`).join('');
+    }
+
+    // Gravidade chart
+    const g1 = ocorrencias.filter(o => o.gravidade === 1).length;
+    const g2 = ocorrencias.filter(o => o.gravidade === 2).length;
+    const g3 = ocorrencias.filter(o => o.gravidade === 3).length;
+    const maxG = Math.max(g1, g2, g3, 1);
+
+    document.getElementById('dash-grav-chart').innerHTML = `
+      <div class="grav-row">
+        <div class="grav-name">🟢 Baixa</div>
+        <div class="bar-bg"><div class="bar-fill g1" style="width:${(g1/maxG*100)}%"></div></div>
+        <div class="bar-count">${g1}</div>
+      </div>
+      <div class="grav-row">
+        <div class="grav-name">🟡 Média</div>
+        <div class="bar-bg"><div class="bar-fill g2" style="width:${(g2/maxG*100)}%"></div></div>
+        <div class="bar-count">${g2}</div>
+      </div>
+      <div class="grav-row">
+        <div class="grav-name">🔴 Grave</div>
+        <div class="bar-bg"><div class="bar-fill g3" style="width:${(g3/maxG*100)}%"></div></div>
+        <div class="bar-count">${g3}</div>
+      </div>
+    `;
+
+    // Bairros ranking
+    const bairroCount = {};
+    ocorrencias.forEach(o => { bairroCount[o.bairro] = (bairroCount[o.bairro] || 0) + 1; });
+    const topBairros = Object.entries(bairroCount).sort((a,b) => b[1]-a[1]).slice(0, 5);
+    if (topBairros.length > 0) {
+      const maxB = topBairros[0][1];
+      document.getElementById('dash-bairro-ranking').innerHTML = `
+        <div style="font-size:12px;font-weight:700;color:var(--slate-500);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em;">🏘️ Top Bairros</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          ${topBairros.map(([b,n]) => `
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="font-size:12.5px;width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${b}</div>
+              <div style="flex:1;height:8px;background:var(--slate-100);border-radius:999px;overflow:hidden;">
+                <div style="height:100%;background:var(--green-500);border-radius:999px;width:${n/maxB*100}%"></div>
+              </div>
+              <div style="font-size:12px;color:var(--slate-500);font-weight:600;width:20px;text-align:right;">${n}</div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+  } catch(e) {
+    console.error(e);
+    toast(`Erro ao carregar dashboard: ${e.message}`, 'error');
+  }
+}
+
+// ============================================================
+// OCORRÊNCIAS
+// ============================================================
+async function loadOcorrencias(forceRefresh = false) {
+  if (forceRefresh) cache.ocorrencias = null;
+
+  // Load selects in parallel
+  loadBairrosSelect();
+  loadCategoriasSelect();
+
+  try {
+    const data = cache.ocorrencias || await apiFetch('/ocorrencias/');
+    cache.ocorrencias = data;
+    occAll = [...data].reverse();
+    occPage = 1;
+    renderOccTable();
+  } catch(e) {
+    document.getElementById('occ-table-body').innerHTML =
+      `<tr><td colspan="6"><div class="empty"><div class="empty-icon">❌</div><p>Erro: ${e.message}</p></div></td></tr>`;
+    toast(`Erro ao carregar ocorrências: ${e.message}`, 'error');
+  }
+}
+
+function getFilteredOcc() {
+  const search = (document.getElementById('occ-search')?.value || '').toLowerCase();
+  const grav   = document.getElementById('occ-filter-grav')?.value;
+  const status = document.getElementById('occ-filter-status')?.value;
+
+  return occAll.filter(o => {
+    if (grav   && String(o.gravidade) !== grav) return false;
+    if (status !== '' && status !== undefined && String(o.ativo) !== status) return false;
+    if (search && !(`${o.bairro} ${o.problema}`.toLowerCase().includes(search))) return false;
+    return true;
+  });
+}
+
+function filterOcorrencias() {
+  occPage = 1;
+  renderOccTable();
+}
+
+function renderOccTable() {
+  const filtered = getFilteredOcc();
+  const totalPages = Math.max(1, Math.ceil(filtered.length / OCC_PER_PAGE));
+  if (occPage > totalPages) occPage = totalPages;
+  const slice = filtered.slice((occPage-1)*OCC_PER_PAGE, occPage*OCC_PER_PAGE);
+
+  const tbody = document.getElementById('occ-table-body');
+  if (slice.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty"><div class="empty-icon">📭</div><p>Nenhuma ocorrência encontrada.</p></div></td></tr>`;
+  } else {
+    tbody.innerHTML = slice.map(o => `
+      <tr>
+        <td><span style="font-weight:700;color:var(--slate-400)">#${o.id}</span></td>
+        <td><strong>${o.bairro}</strong></td>
+        <td>${o.problema}</td>
+        <td>${gravBadge(o.gravidade)}</td>
+        <td>${statusBadge(o.ativo)}</td>
+        <td style="text-align:right">
+          <button class="btn btn-danger btn-sm" onclick="deleteOcorrencia(${o.id}, '${escHtml(o.bairro)}', '${escHtml(o.problema)}')">
+            🗑️ Eliminar
+          </button>
+        </td>
+      </tr>`).join('');
+  }
+
+  // Pagination
+  const pag = document.getElementById('occ-pagination');
+  if (totalPages <= 1) { pag.innerHTML = ''; return; }
+
+  let pages = '';
+  for (let i = 1; i <= totalPages; i++) {
+    pages += `<button class="btn btn-sm ${i === occPage ? 'btn-primary' : 'btn-outline'}" onclick="goOccPage(${i})">${i}</button>`;
+  }
+  pag.innerHTML = `
+    <span style="font-size:12px;color:var(--slate-400);">${filtered.length} resultados</span>
+    <div style="display:flex;gap:4px;">${pages}</div>
+  `;
+}
+
+function goOccPage(p) { occPage = p; renderOccTable(); }
+
+async function submitOcorrencia(e) {
+  e.preventDefault();
+  const id_categoria_p = parseInt(document.getElementById('occ-categoria').value);
+  const id_bairros     = parseInt(document.getElementById('occ-bairro').value);
+
+  if (!id_categoria_p || !id_bairros) {
+    toast('Preencha todos os campos!', 'warning');
+    return;
+  }
+
+  const btn = document.getElementById('btn-submit-occ');
+  btn.disabled = true;
+  btn.textContent = '⏳ A registar...';
+
+  try {
+    await apiFetch('/ocorrencias/', {
+      method: 'POST',
+      body: JSON.stringify({ id_categoria_p, id_bairros }),
+    });
+    toast('Ocorrência registada com sucesso! ✅', 'success');
+    cache.ocorrencias = null;
+    document.getElementById('form-ocorrencia').reset();
+    await loadOcorrencias(true);
+  } catch(err) {
+    toast(`Erro: ${err.message}`, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '✅ Registar Ocorrência';
+  }
+}
+
+function deleteOcorrencia(id, bairro, problema) {
+  openConfirm(
+    'Eliminar Ocorrência',
+    `Tem a certeza que deseja eliminar a ocorrência #${id} (${problema} em ${bairro})?`,
+    async () => {
+      try {
+        await apiFetch(`/ocorrencias/${id}`, { method: 'DELETE' });
+        toast(`Ocorrência #${id} eliminada.`, 'success');
+        cache.ocorrencias = null;
+        await loadOcorrencias(true);
+        // Update dashboard badge
+        const count = document.getElementById('badge-ocorrencias');
+        if (count) count.textContent = occAll.length;
+      } catch(err) {
+        toast(`Erro: ${err.message}`, 'error');
+      }
+    }
+  );
+}
+
+// ============================================================
+// CATEGORIAS
+// ============================================================
+async function loadCategorias(forceRefresh = false) {
+  if (forceRefresh) cache.categorias = null;
+  try {
+    const data = cache.categorias || await apiFetch('/categorias/');
+    cache.categorias = data;
+
+    const tbody = document.getElementById('cat-table-body');
+    if (!data || data.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="4"><div class="empty"><div class="empty-icon">🗂️</div><p>Nenhuma categoria registada.</p></div></td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = data.map(c => `
+      <tr>
+        <td><span style="font-weight:700;color:var(--slate-400)">#${c.id}</span></td>
+        <td><strong>${c.problema || `Problema #${c.id_problema}`}</strong></td>
+        <td>${gravBadge(c.gravidade)}</td>
+        <td style="text-align:right">
+          <button class="btn btn-danger btn-sm" onclick="deleteCategoria(${c.id})">🗑️ Eliminar</button>
+        </td>
+      </tr>`).join('');
+  } catch(e) {
+    document.getElementById('cat-table-body').innerHTML =
+      `<tr><td colspan="4"><div class="empty"><div class="empty-icon">❌</div><p>${e.message}</p></div></td></tr>`;
+    toast(`Erro categorias: ${e.message}`, 'error');
+  }
+}
+
+async function loadProblemasSelect() {
+  try {
+    const data = cache.problemas || await apiFetch('/problemas');
+    cache.problemas = data;
+    const sel = document.getElementById('cat-problema');
+    if (!sel) return;
+    const cur = sel.value;
+    sel.innerHTML = `<option value="">— Selecionar Problema —</option>` +
+      (data || []).map(p => `<option value="${p.id_problema}">${p.problema}</option>`).join('');
+    if (cur) sel.value = cur;
+  } catch(e) {}
+}
+
+function selectGravidade(val) {
+  selectedGravidade = val;
+  document.getElementById('cat-gravidade').value = val;
+  document.querySelectorAll('.grav-opt').forEach(el => {
+    el.classList.remove('sel-1', 'sel-2', 'sel-3');
+  });
+  document.querySelector(`.grav-opt[data-val="${val}"]`).classList.add(`sel-${val}`);
+}
+
+async function submitCategoria(e) {
+  e.preventDefault();
+  const id_problema = parseInt(document.getElementById('cat-problema').value);
+  const gravidade   = parseInt(document.getElementById('cat-gravidade').value);
+
+  if (!id_problema) { toast('Selecione um problema!', 'warning'); return; }
+  if (!gravidade)   { toast('Selecione a gravidade!', 'warning'); return; }
+
+  try {
+    await apiFetch('/categorias/', {
+      method: 'POST',
+      body: JSON.stringify({ id_problema, gravidade }),
+    });
+    toast('Categoria criada com sucesso!', 'success');
+    cache.categorias = null;
+    document.getElementById('form-categoria').reset();
+    selectedGravidade = 0;
+    document.querySelectorAll('.grav-opt').forEach(el => el.classList.remove('sel-1','sel-2','sel-3'));
+    document.getElementById('cat-gravidade').value = '';
+    await loadCategorias(true);
+  } catch(err) {
+    toast(`Erro: ${err.message}`, 'error');
+  }
+}
+
+function deleteCategoria(id) {
+  openConfirm(
+    'Eliminar Categoria',
+    `Tem a certeza que deseja eliminar a categoria #${id}? Ocorrências ligadas a ela podem ser afetadas.`,
+    async () => {
+      try {
+        await apiFetch(`/categorias/${id}`, { method: 'DELETE' });
+        toast(`Categoria #${id} eliminada.`, 'success');
+        cache.categorias = null;
+        await loadCategorias(true);
+      } catch(err) {
+        toast(`Erro: ${err.message}`, 'error');
+      }
+    }
+  );
+}
+
+// ============================================================
+// BAIRROS
+// ============================================================
+async function loadBairros(forceRefresh = false) {
+  if (forceRefresh) cache.bairros = null;
+  try {
+    const data = cache.bairros || await apiFetch('/bairros');
+    cache.bairros = data;
+
+    const grid = document.getElementById('bairros-grid');
+    if (!data || data.length === 0) {
+      grid.innerHTML = `<div class="empty"><div class="empty-icon">🏘️</div><p>Nenhum bairro encontrado.</p></div>`;
+      return;
+    }
+    grid.innerHTML = data.map(b => `
+      <div style="
+        background:var(--green-50);
+        border:1px solid var(--green-200);
+        border-radius:10px;
+        padding:14px;
+        display:flex;
+        flex-direction:column;
+        gap:4px;
+      ">
+        <span style="font-size:22px;">🏘️</span>
+        <span style="font-weight:700;font-size:13.5px;color:var(--green-800);">${b.bairro}</span>
+        <span style="font-size:11px;color:var(--green-600);">ID #${b.id}</span>
+      </div>
+    `).join('');
+  } catch(e) {
+    document.getElementById('bairros-grid').innerHTML =
+      `<div class="empty"><div class="empty-icon">❌</div><p>${e.message}</p></div>`;
+    toast(`Erro bairros: ${e.message}`, 'error');
+  }
+}
+
+async function loadBairrosSelect() {
+  try {
+    const data = cache.bairros || await apiFetch('/bairros');
+    cache.bairros = data;
+    const sel = document.getElementById('occ-bairro');
+    if (!sel) return;
+    const cur = sel.value;
+    sel.innerHTML = `<option value="">— Selecionar Bairro —</option>` +
+      (data || []).map(b => `<option value="${b.id}">${b.bairro}</option>`).join('');
+    if (cur) sel.value = cur;
+  } catch(e) {}
+}
+
+// ============================================================
+// PROBLEMAS
+// ============================================================
+async function loadProblemas(forceRefresh = false) {
+  if (forceRefresh) cache.problemas = null;
+  try {
+    const data = cache.problemas || await apiFetch('/problemas');
+    cache.problemas = data;
+
+    const tbody = document.getElementById('prob-table-body');
+    if (!data || data.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="2"><div class="empty"><div class="empty-icon">⚠️</div><p>Nenhum problema cadastrado.</p></div></td></tr>`;
+      return;
+    }
+    tbody.innerHTML = data.map(p => `
+      <tr>
+        <td><span style="font-weight:700;color:var(--slate-400)">#${p.id_problema}</span></td>
+        <td><strong>${p.problema}</strong></td>
+      </tr>`).join('');
+  } catch(e) {
+    document.getElementById('prob-table-body').innerHTML =
+      `<tr><td colspan="2"><div class="empty"><div class="empty-icon">❌</div><p>${e.message}</p></div></td></tr>`;
+    toast(`Erro problemas: ${e.message}`, 'error');
+  }
+}
+
+// ============================================================
+// CATEGORIAS SELECT (for ocorrencias form)
+// ============================================================
+async function loadCategoriasSelect() {
+  try {
+    // We need both categorias and problemas to build a readable label
+    const [cats, probs] = await Promise.all([
+      cache.categorias || apiFetch('/categorias/'),
+      cache.problemas  || apiFetch('/problemas'),
+    ]);
+    cache.categorias = cats;
+    cache.problemas  = probs;
+
+    const probMap = {};
+    (probs || []).forEach(p => { probMap[p.id_problema] = p.problema; });
+
+    const sel = document.getElementById('occ-categoria');
+    if (!sel) return;
+    const cur = sel.value;
+    sel.innerHTML = `<option value="">— Selecionar Categoria —</option>` +
+      (cats || []).map(c => {
+        const pName = probMap[c.id_problema] || `Problema #${c.id_problema}`;
+        const gLabel = { 1:'🟢 Baixa', 2:'🟡 Média', 3:'🔴 Grave' }[c.gravidade] || c.gravidade;
+        return `<option value="${c.id}">${pName} — ${gLabel}</option>`;
+      }).join('');
+    if (cur) sel.value = cur;
+  } catch(e) {}
+}
+
+// ============================================================
+// CONFIG PAGE
+// ============================================================
+function initConfig() {
+  document.getElementById('config-url').value = API_BASE;
+}
+
+function saveApiUrl() {
+  const val = document.getElementById('config-url').value.trim();
+  if (!val) { toast('URL não pode estar vazio!', 'warning'); return; }
+  API_BASE = normalize(val);
+  localStorage.setItem('zeladoria_api_url', API_BASE);
+  toast('URL guardada com sucesso!', 'success');
+  cache = {};
+  checkApiStatus();
+}
+
+async function testApiUrl() {
+  const val = document.getElementById('config-url').value.trim();
+  if (!val) { toast('Insira a URL primeiro!', 'warning'); return; }
+  API_BASE = normalize(val);
+
+  const result = document.getElementById('config-test-result');
+  const eps    = document.getElementById('config-endpoints');
+  result.innerHTML = `<span style="color:var(--slate-500)">⏳ A testar conexão...</span>`;
+  eps.innerHTML    = `<div class="spinner-wrap"><div class="spinner"></div></div>`;
+
+  const endpoints = [
+    { path: '/bairros',      label: 'GET /bairros' },
+    { path: '/problemas',    label: 'GET /problemas' },
+    { path: '/categorias/',  label: 'GET /categorias/' },
+    { path: '/ocorrencias/', label: 'GET /ocorrencias/' },
+  ];
+
+  let allOk = true;
+  const rows = await Promise.all(endpoints.map(async ep => {
+    try {
+      await apiFetch(ep.path);
+      return { label: ep.label, ok: true };
+    } catch(e) {
+      allOk = false;
+      return { label: ep.label, ok: false, err: e.message };
+    }
+  }));
+
+  result.innerHTML = allOk
+    ? `<span style="color:var(--green-700);font-weight:600;">✅ API funcionando correctamente!</span>`
+    : `<span style="color:var(--red-600);font-weight:600;">❌ Alguns endpoints falharam. Verifique a URL e se o serviço está a correr no Render.</span>`;
+
+  eps.innerHTML = rows.map(r => `
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--slate-100);">
+      <span style="font-size:16px;">${r.ok ? '✅' : '❌'}</span>
+      <code style="font-size:12.5px;background:var(--slate-100);padding:2px 8px;border-radius:5px;">${r.label}</code>
+      ${!r.ok ? `<span style="font-size:12px;color:var(--red-500);">${r.err}</span>` : ''}
+    </div>
+  `).join('');
+
+  if (allOk) {
+    localStorage.setItem('zeladoria_api_url', API_BASE);
+    checkApiStatus();
+  }
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+// ============================================================
+// INIT
+// ============================================================
+(async function init() {
+  checkApiStatus();
+  loadDashboard();
+})();
+</script>
+</body>
+</html>
