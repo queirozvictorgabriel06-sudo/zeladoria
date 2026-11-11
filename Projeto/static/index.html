@@ -1383,7 +1383,27 @@ async function submitCategoria(e) {
   if (!id_problema) { toast('Selecione um problema!', 'warning'); return; }
   if (!gravidade)   { toast('Selecione a gravidade!', 'warning'); return; }
 
+  // Verificar duplicata: mesma combinação problema + gravidade já existe?
   try {
+    const cats = cache.categorias || await apiFetch('/categorias/');
+    cache.categorias = cats;
+
+    const duplicada = (cats || []).find(c => {
+      // Se tiver c.id_problema compara por ele, ou compara com c.problema
+      const probSel = document.getElementById('cat-problema');
+      const selectedText = probSel?.options[probSel.selectedIndex]?.text?.trim().toLowerCase();
+      const catText = (c.problema || '').trim().toLowerCase();
+      return (Number(c.id_problema) === id_problema || catText === selectedText) && Number(c.gravidade) === gravidade;
+    });
+
+    if (duplicada) {
+      const gravNome = { 1: 'Baixa', 2: 'Média', 3: 'Grave' }[gravidade];
+      const probSel  = document.getElementById('cat-problema');
+      const probNome = probSel.options[probSel.selectedIndex]?.text || `#${id_problema}`;
+      toast(`⚠️ Já existe uma categoria "${probNome}" com gravidade ${gravNome}!`, 'warning', 5000);
+      return;
+    }
+
     await apiFetch('/categorias/', {
       method: 'POST',
       body: JSON.stringify({ id_problema, gravidade }),
@@ -1497,23 +1517,16 @@ async function loadProblemas(forceRefresh = false) {
 // ============================================================
 async function loadCategoriasSelect() {
   try {
-    // We need both categorias and problemas to build a readable label
-    const [cats, probs] = await Promise.all([
-      cache.categorias || apiFetch('/categorias/'),
-      cache.problemas  || apiFetch('/problemas'),
-    ]);
+    const cats = cache.categorias || await apiFetch('/categorias/');
     cache.categorias = cats;
-    cache.problemas  = probs;
-
-    const probMap = {};
-    (probs || []).forEach(p => { probMap[p.id_problema] = p.problema; });
 
     const sel = document.getElementById('occ-categoria');
     if (!sel) return;
     const cur = sel.value;
     sel.innerHTML = `<option value="">— Selecionar Categoria —</option>` +
       (cats || []).map(c => {
-        const pName = probMap[c.id_problema] || `Problema #${c.id_problema}`;
+        // Usa c.problema diretamente da API se existir
+        const pName = c.problema || `Problema #${c.id_problema || c.id}`;
         const gLabel = { 1:'🟢 Baixa', 2:'🟡 Média', 3:'🔴 Grave' }[c.gravidade] || c.gravidade;
         return `<option value="${c.id}">${pName} — ${gLabel}</option>`;
       }).join('');
