@@ -19,9 +19,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/", include_in_schema=False)
-def tela():
-    return FileResponse(Path(__file__).parent / "static" / "indexx.html")
+
 
 
 app.include_router(consultas.router)
